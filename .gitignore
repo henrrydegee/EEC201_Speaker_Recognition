@@ -1,0 +1,8 @@
+# Drive Files
+./.tmp.drivedownload/
+.vscode/
+.MATLABDriveTag
+
+
+# Zip Files
+*.zip

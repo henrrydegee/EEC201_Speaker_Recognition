@@ -3,9 +3,22 @@ clear; clc; close all;
 % [Insert Name Here]
 
 %% MAIN
+% Steps:
+% 1. stft()
+% 2. map the powers to each mel freq: mult mel
+% 3. take the logs of power at each mel: log(2)
+% 4. take the dct: dct(3)
+% 5. take the amplitude: abs(4)
+
 [s, fs] = getFile(10);
-y = STFT(s);
-figure; plot(0:255, abs(y));
+N = 256; M = round(N*2/3);
+figure; stft(s, fs, 'Window', hamming(N), 'OverlapLength', M);
+
+% [col, row] = size(y);
+% t = 1:row;
+% x = 0:col-1;
+% figure; surf(t,x,abs(y),'EdgeColor','none'); ylabel('Frequency');
+% axis xy; axis tight; colormap(jet); view(0,90);
 
 %figure; plot(linspace(0, (12500/2), 129), melfb(20, 256, 12500)');
 %title('Mel-spaced filterbank'); xlabel('Frequency (Hz)');
@@ -13,7 +26,8 @@ figure; plot(0:255, abs(y));
 %% Spectrum-related Functions
 function y = STFT(s)
     % Return the Short-time Fourier Transform
-    % TODO: Debug this
+    % DEPRECATED: JUST USE stft()
+    % WARNING: WILL BE DELETED WHEN MERGE
     
     N = 256; % frame size
     M = round(N/3); % frame increment

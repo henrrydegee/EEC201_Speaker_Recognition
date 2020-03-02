@@ -2,7 +2,13 @@
 ./.tmp.drivedownload/
 .vscode/
 .MATLABDriveTag
-
+desktop.ini
 
 # Zip Files
 *.zip
+
+# Matlab
+*.asv
+
+#
+./Data/desktop.ini

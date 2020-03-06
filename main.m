@@ -21,73 +21,49 @@ M = round(N*2/3); % overlap length for stft()
 %sound(cropZero(s10), fs10)
 %plotTime(s10, fs10)
 
-% plotTime(cropZero(s10), fs10)
-% plotTime(cropZero(s2), fs2)
+plotTime(cropZero(s10), fs10)
+plotTime(cropZero(s2), fs2)
 
 %% Start MFCC
 [cn10, ystt10] = mfcc(cropZero(s10), fs10, N, p, M);
 [cn2, ystt2] = mfcc(cropZero(s2), fs2, N, p, M);
 [cn7, ystt7] = mfcc(cropZero(s7), fs7, N, p, M);
 
-% Step 5: Plot the amplitude output of the dct
-plotMFCC(ystt10, cn10./ max(max(abs(cn10))), p, 10)
-plotMFCC(ystt2, cn2 ./ max(max(abs(cn2))), p, 2)
-plotMFCC(ystt7, cn7 ./ max(max(abs(cn7))), p, 7)
+% % Step 5: Plot the amplitude output of the dct
+% plotMFCC(ystt10, cn10./ max(max(abs(cn10))), p, 10)
+% plotMFCC(ystt2, cn2 ./ max(max(abs(cn2))), p, 2)
+% plotMFCC(ystt7, cn7 ./ max(max(abs(cn7))), p, 7)
 
 %% Prepare for k-Clustering
 normCN10 = cn10 ./ max(max(abs(cn10)));
 normCN2 = cn2 ./ max(max(abs(cn2)));
 normCN7 = cn7 ./ max(max(abs(cn7)));
 
-% [x10, y10, z10] = surfToXYZ(ystt10, (1:8)', normCN10(1:8, :)');
-% [x2, y2, z2] = surfToXYZ(ystt2, (1:8)', normCN2(1:8, :)');
-
-[x10, y10, z10] = preProcess(ystt10, (1:p), normCN10);
-[x2, y2, z2] = preProcess(ystt2, (1:p), normCN2);
-[x7, y7, z7] = preProcess(ystt7, (1:p), normCN7);
-
-figure
-scatter3(x2, y2, z2, 'x')
-hold on
-scatter3(x10, y10, z10, 'o')
-scatter3(x7, y7, z7, '+')
-view(90, 0)
-
-K = 2;
-% X = [y10, abs(z10).*abs(z10); y2, abs(z2).*abs(z2)];
-%X = [y10, z10; y2, z2]; % 2 Feature K-Cluster (mfcc coef, amp)
-% X = [x10, y10, z10; x2, y2, z2]; % 3 Feature K-Cluster (time, mfcc coef, amp)
-X = [cn2(2,:)', cn2(3,:)'; cn10(2,:)', cn10(3,:)'];
+K = 5;
+X2 = normCN2(1:3,:)';
+X10 = normCN10(1:3,:)';
 %figure
 
 figure
-plot(cn2(2,:)', cn2(3,:)', 'x')
+plot(cn2(1,:)', cn2(2,:)', 'x')
 hold on
-plot(cn10(2,:)', cn10(3,:)', 'o')
+plot(cn10(1,:)', cn10(2,:)', 'o')
 xlabel('mfcc-1'); ylabel('mfcc-2')
 
 
 %% =================== Part 3: K-Means Clustering ======================
-%  After you have completed the two functions computeCentroids and
-%  findClosestCentroids, you have all the necessary pieces to run the
-%  kMeans algorithm. In this part, you will run the K-Means algorithm on
-%  the example dataset we have provided. 
 
 max_iters = 10;
 
-% For consistency, here we set centroids to specific values
-% but in practice you want to generate them automatically, such as by
-% settings them to be random examples (as can be seen in
-% kMeansInitCentroids).
-
-initial_centroids = [1, 1; -1, -1];
-%initial_centroids = [20, -1; 20, 1; 1, 1; 1, -1; 1, 0];
-% % 3-D Initial
-% initial_centroids = [0, 20, -1;0, 20, 1; 0, 1, 1; 0, 1, -1; 0, 1, 0];
+initial_centroids = kMeansInitCentroids(X2, K);
+thres_distortion = 0.05;
 
 % Run K-Means algorithm. The 'true' at the end tells our function to plot
 % the progress of K-Means
-[centroids, idx] = runkMeans(X, initial_centroids, max_iters, true);
+[centroids, idx] = runLBG(X2, initial_centroids, thres_distortion, true);
+
+initial_centroids = kMeansInitCentroids(X10, K);
+[centroids, idx] = runLBG(X10, initial_centroids, thres_distortion, true);
 fprintf('\nK-Means Done.\n\n');
 
 fprintf('Program paused. Press enter to continue.\n');

@@ -6,9 +6,10 @@ This project builds a system that recognizes the speaker by using mel-frequency 
 coefficients, vector quantization and k-clustering.
 
 ## Completed Milestones
-1. MFCC
+1. Mel-Frequency Cepstrum Coefficients
+2. Vector Quantization
 
 ## Next Steps
-1. VQ
-2. k-clustering
-3. Tidy up and website demo
+1. k-clustering
+2. Integrate with GUI
+3. Website + Report

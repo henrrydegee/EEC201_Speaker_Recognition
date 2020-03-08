@@ -31,6 +31,9 @@ centroids = initial_centroids;
 previous_centroids = centroids;
 idx = zeros(m, 1);
 
+prev_distortion = 0;
+thres_distortion = 0.05;
+
 % Run K-Means
 for i=1:max_iters
     
@@ -53,6 +56,19 @@ for i=1:max_iters
     
     % Given the memberships, compute new centroids
     centroids = computeCentroids(X, idx, K);
+    
+    % LBG Algorithm :
+    curr_distortion = computeDistortion(X, idx, centroids, K)
+    if ( abs( (prev_distortion-curr_distortion)/curr_distortion) < thres_distortion )
+        break
+    end
+    prev_distortion = curr_distortion;
+%     dist_centroids = centroids - previous_centroids;
+%     dist_length = sum(dist_centroids.^2, 'all');
+%     if ( abs(prev_length - dist_length)/dist_length < thres)
+%         break
+%     end
+%     prev_length = dist_length;
 end
 
 % Hold off if we are plotting progress

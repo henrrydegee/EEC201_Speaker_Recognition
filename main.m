@@ -55,7 +55,7 @@ xlabel('mfcc-6'); ylabel('mfcc-7')
 
 %% =================== Part 3: K-Means Clustering ======================
 K = 3;%7;
-initial_centroids = kMeansInitCentroids(X2, K);
+initial_centroids = initiateTheHood(X2, K);
 thres_distortion = 0.03;
 
 % Run K-Means algorithm. The 'true' at the end tells our function to plot
@@ -63,11 +63,11 @@ thres_distortion = 0.03;
 [centroids2, idx2, distortion2] = runLBG(X2, initial_centroids, ...
     thres_distortion, true);
 
-initial_centroids = kMeansInitCentroids(X10, K);
+initial_centroids = initiateTheHood(X10, K);
 [centroids10, idx10, distortion10] = runLBG(X10, initial_centroids, ...
     thres_distortion, true);
 
-initial_centroids = kMeansInitCentroids(X7, K);
+initial_centroids = initiateTheHood(X7, K);
 [centroids7, idx7, distortion7] = runLBG(X7, initial_centroids, ...
     thres_distortion, true);
 
@@ -85,7 +85,7 @@ pause;
 % thres_distortion = 0.03;
 % distortions = zeros(maxK, 1);
 % for K = 1:maxK
-%     initial_centroids = kMeansInitCentroids(X2, K);
+%     initial_centroids = initiateTheHood(X2, K);
 %     [centroids, idx, distortion] = runLBG(X2, initial_centroids, ...
 %     thres_distortion);
 %     distortions(K, 1) = distortion;
@@ -105,7 +105,7 @@ pause;
 % distortions = zeros(size(thres_distortion,1), 1);
 % 
 % for row = 1:size(thres_distortion,1)
-%     initial_centroids = kMeansInitCentroids(X2, K);
+%     initial_centroids = initiateTheHood(X2, K);
 %     [centroids, idx, distortion] = runLBG(X2, initial_centroids, ...
 %     thres_distortion(row,1) );
 %     distortions(row, 1) = distortion;

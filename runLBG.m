@@ -27,7 +27,7 @@ if plot_progress
 end
 
 % Set default value for distortion threshold
-if isempty(thres_distortion)
+if ~exist('thres_distortion', 'var') || isempty(thres_distortion)
     thres_distortion = 0.05;
 end
 

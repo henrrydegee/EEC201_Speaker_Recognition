@@ -1,5 +1,5 @@
 %% mfcc function
-function [cn, ystt] = mfcc(s, fs, N, p, M)
+function [cn, ystt] = mfcc(s, fs, N, p, M, normalize)
 % Calculates the Mel-Frequency Ceptstral Coefficients
 % Inputs:
 % s - Audio vector (assuming 1-channel/mono-channel)
@@ -7,6 +7,9 @@ function [cn, ystt] = mfcc(s, fs, N, p, M)
 % N - Number of elements in Hamming window for stft()
 % p - Number of filters in the filter bank for melfb
 % M - overlap length for stft()
+% normalize - boolean (T/F): T -> Normalize mfcc Amplitudes
+%   |-Note: normalize is set to false by default
+%   |-Refer to Step 5
 %
 % Outputs:
 % cn - Mel-Frequency Ceptstral Coefficients w/ size (p*length(ystt))
@@ -42,7 +45,16 @@ mfcstuff = m * ystcut; % matrix multiply mel with stft
 sk = log10(mfcstuff);
 cn = dct(sk);
 
-% Step 5: Plot the amplitude output of the dct
+% Step 5: Normalize mfcc Amplitudes
+if ~exist('normalize', 'var') || isempty(normalize)
+    normalize = false;
+end
+
+if normalize
+    cn = cn ./ max(max(abs(cn))); % Using L-inf normalization
+end
+
+% Step 6: Plot the amplitude output of the dct
 %plotSpec(ystt, 1:p, cn); caxis([-30 15]);
 %xlim([min(ystt), max(ystt)]); ylim([1 p]);
 %xlabel('Time (s)'); ylabel('mfc coefficients')

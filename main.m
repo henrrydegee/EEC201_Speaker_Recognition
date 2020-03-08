@@ -21,8 +21,9 @@ M = round(N*2/3); % overlap length for stft()
 %sound(cropZero(s10), fs10)
 %plotTime(s10, fs10)
 
-plotTime(cropZero(s10), fs10)
+%plotTime(cropZero(s10), fs10)
 plotTime(cropZero(s2), fs2)
+
 
 %% Start MFCC
 [cn10, ystt10] = mfcc(cropZero(s10), fs10, N, p, M);

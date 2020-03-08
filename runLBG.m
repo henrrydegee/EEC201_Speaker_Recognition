@@ -1,6 +1,6 @@
 %% LBG Algorithm:
 % Inspired by Run-TMC and Run-DMC
-function [centroids, idx] = runLBG(X, initial_centroids, ...
+function [centroids, idx, curr_distortion] = runLBG(X, initial_centroids, ...
                                       thres_distortion, plot_progress)
 %RUNKMEANS runs the K-Means algorithm on data matrix X, where each row of X
 %is a single example
@@ -65,11 +65,11 @@ while (1)
         plotProgresskMeans(X, centroids, previous_centroids, idx, K, i);
         previous_centroids = centroids;
         fprintf('Press enter to continue.\n');
-        pause;
+        pause(0.25);
     end
     
     % Given the memberships, compute new centroids
-    centroids = GoToMyHood(X, idx, K);
+    centroids = GoToMyHood(X, centroids, idx, K);
     
     % LBG Algorithm :
     curr_distortion = ThisTheHouse(X, idx, centroids, K);
@@ -124,7 +124,7 @@ function idx = findMyHood(X, centroids)
 end
 
 %% GoToMyHood() defintion
-function centroids = GoToMyHood(X, idx, K)
+function centroids = GoToMyHood(X, prev_centroids, idx, K)
 %GoToMyHood finds the new centroids' location by computing 
 %the means of the data points assigned to each centroid.
 %
@@ -142,6 +142,10 @@ function centroids = GoToMyHood(X, idx, K)
 
     for i = 1:K
         sel = find(idx == i); % where i ranges from 1 to K
+%         if ( isempty(sel) )
+%             centroids(i,:) = prev_centroids(i,:);
+%             continue
+%         end
         centroids(i,:) = mean(X(sel,:));
     end
 

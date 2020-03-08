@@ -39,63 +39,83 @@ normCN10 = cn10 ./ max(max(abs(cn10)));
 normCN2 = cn2 ./ max(max(abs(cn2)));
 normCN7 = cn7 ./ max(max(abs(cn7)));
 
-K = 5;
-X2 = normCN2(1:3,:)';
-X10 = normCN10(1:3,:)';
+X2 = normCN2(1:12,:)';
+X7 = normCN2(1:12,:)';
+X10 = normCN10(1:12,:)';
 %figure
 
 figure
-plot(cn2(1,:)', cn2(2,:)', 'x')
+plot(cn2(6,:)', cn2(7,:)', 'x')
 hold on
-plot(cn10(1,:)', cn10(2,:)', 'o')
-xlabel('mfcc-1'); ylabel('mfcc-2')
+plot(cn10(6,:)', cn10(7,:)', 'o')
+xlabel('mfcc-6'); ylabel('mfcc-7')
 
 
 %% =================== Part 3: K-Means Clustering ======================
-
-max_iters = 10;
-
+K = 3;%7;
 initial_centroids = kMeansInitCentroids(X2, K);
-thres_distortion = 0.05;
+thres_distortion = 0.03;
 
 % Run K-Means algorithm. The 'true' at the end tells our function to plot
 % the progress of K-Means
-[centroids, idx] = runLBG(X2, initial_centroids, thres_distortion, true);
+[centroids2, idx2, distortion2] = runLBG(X2, initial_centroids, ...
+    thres_distortion, true);
 
 initial_centroids = kMeansInitCentroids(X10, K);
-[centroids, idx] = runLBG(X10, initial_centroids, thres_distortion, true);
+[centroids10, idx10, distortion10] = runLBG(X10, initial_centroids, ...
+    thres_distortion, true);
+
+initial_centroids = kMeansInitCentroids(X7, K);
+[centroids7, idx7, distortion7] = runLBG(X7, initial_centroids, ...
+    thres_distortion, true);
+
+%tScore = tPrime(centroids2, centroids10, distortion2, distortion10)
 fprintf('\nK-Means Done.\n\n');
 
 fprintf('Program paused. Press enter to continue.\n');
 pause;
 
-%% Recognizing Point Clusters through different axis
-
-% Plotting Time vs Amplitude at a given mfc coefficient
-% mfcc_id = 1;
-% figure; plot(ystt2, cn2(mfcc_id,:)', 'x');
-% xlabel('Time (s)'); ylabel('Amplitude');
-% title(strcat( 'Speaker ID: ', int2str(2),...
-%     ' w/ Coefficient: ', int2str(mfcc_id) ));
-
-% Dynamically Plotting mfcc vs Amplitude through time
-% figure;
-% plot(1:p, cn2(:,1), 'x');
-% hold on
-% plot(1:p, cn10(:,1), 'o');
-% for t = 2:length(ystt10)
-%     hold off
-%     plot(1:p, cn2(:,t), 'x');
-%     hold on
-%     plot(1:p, cn10(:,t), 'o');
-%     xlabel('mfcc Coefficient'); ylabel('Amplitude');
-%     ylim([-10, 10]);
-%     legend('Speaker ID: 2', 'Speaker ID: 10');
-%     pause(0.1); hold off
-%     %title(strcat( 'Time: ', int2str(ystt2(t) ) ));
+%% Finding Optimal Number of Clusters Value
+% X2 = normCN2(1:20,:)';
+% X10 = normCN10(1:20,:)';
+% 
+% maxK = 25;
+% thres_distortion = 0.03;
+% distortions = zeros(maxK, 1);
+% for K = 1:maxK
+%     initial_centroids = kMeansInitCentroids(X2, K);
+%     [centroids, idx, distortion] = runLBG(X2, initial_centroids, ...
+%     thres_distortion);
+%     distortions(K, 1) = distortion;
 % end
+% 
+% figure
+% plot( (1:maxK)', distortions); hold on;
+% grid on
+% xlabel('Number of K-Cluster'); ylabel('Distortion Loss');
+% title(strcat('Threshold = ', ...
+%     num2str(thres_distortion) ) );
 
-
+%% Finding Optimal Threshold
+% max_thres = 0.05;
+% K = 7;
+% thres_distortion = (0.01:0.002:max_thres)';
+% distortions = zeros(size(thres_distortion,1), 1);
+% 
+% for row = 1:size(thres_distortion,1)
+%     initial_centroids = kMeansInitCentroids(X2, K);
+%     [centroids, idx, distortion] = runLBG(X2, initial_centroids, ...
+%     thres_distortion(row,1) );
+%     distortions(row, 1) = distortion;
+% end
+% 
+% figure
+% plot( thres_distortion, distortions); hold on;
+% grid on
+% xlabel('Distortion Threshold'); ylabel('Distortion Loss');
+% title(strcat('K = ', ...
+%     num2str(K) ) );
+% 
 %% File IO Functions
 function [s, fs, t] = getFile(id)
     % Reads from ./Data to fetch the file
@@ -174,54 +194,4 @@ function xn = fseries(f1, f2, n, fs, step)
             xn = xn * 100 ./ (f);
         end
     end
-end
-
-%% mfcc function
-function [cn, ystt] = mfcc(s, fs, N, p, M)
-% Calculates the Mel-Frequency Ceptstral Coefficients
-% Inputs:
-% s - Audio vector (assuming 1-channel/mono-channel)
-% fs - Sampling Frequency
-% N - Number of elements in Hamming window for stft()
-% p - Number of filters in the filter bank for melfb
-% M - overlap length for stft()
-%
-% Outputs:
-% cn - Mel-Frequency Ceptstral Coefficients w/ size (p*length(ystt))
-% ystt - Time-domain for STFT(Short-Time Fourier Transform)
-
-% Step 1: Take the stft of signal
-[yst, ystf, ystt] = stft(s, fs, 'Window', hamming(N), 'OverlapLength', M);
-% yst: mxn matrix amplitude output of stft
-% ystf: mx1 frequency output corresponding to stft
-% ystt: nx1 time output corresponding to stft
-
-% plotSpec(ystt, ystf, db(abs(yst))); caxis([-40, max(db(yst(:)))]);
-% xlim([min(ystt), max(ystt)]); ylim([min(ystf), max(ystf)]);
-% xlabel('Time (s)'); ylabel('Frequency (Hz)');
-
-% Step 2: Get mel frequency filter bank
-m = melfb(p, N, fs); % Mel-spaced filter bank
-
-% figure; plot(linspace(0, (fs/2), 129), m');
-% title('Mel-spaced filterbank'); xlabel('Frequency (Hz)');
-
-% Step 3: Take the positive half of the frequency (since symmetry)
-% and matrix multiply the mel filter bank with stft output
-ystcut = yst((N/2):end, :);
-ystcut = ystcut .* conj(ystcut); % take square
-mfcstuff = m * ystcut; % matrix multiply mel with stft
-
-% plotSpec(ystt, 1:p, db(abs(mfcstuff))); caxis([-40, max(db(mfcstuff(:)))]);
-% xlim([min(ystt), max(ystt)]); ylim([0 p-1]);
-
-% Step 4: Take the log10 of the matrix multiply output
-% and apply dct (Discrete Cosine Transform)
-sk = log10(mfcstuff);
-cn = dct(sk);
-
-% Step 5: Plot the amplitude output of the dct
-%plotSpec(ystt, 1:p, cn); caxis([-30 15]);
-%xlim([min(ystt), max(ystt)]); ylim([1 p]);
-%xlabel('Time (s)'); ylabel('mfc coefficients')
 end

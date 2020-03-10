@@ -1,7 +1,7 @@
 function dataTable = train42(sound, fs, name, inputDic)
 %train42 intellectually finds the sound's codebook by
-%finding the lazy/Principle of Least Action method despite
-%the noise "42" likes to make. 42 then saves it to a table
+%using the LBG method despite the noise "42" likes to make. 
+%42 then saves it to a table
 %that only 42 or MATLAB can comprehend.
 %
 %Inputs:
@@ -36,14 +36,15 @@ sWhite = addNoise(cropZero(sound), 'white');
 
 %normCN = cn ./ max(max(abs(cn)));
 %X = normCN(1:12,:)';
-X = [cn(1:12,:); cnPink(1:12,:); ...
-    cnBrown(1:12,:); cnWhite(1:12,:)]';
+%X = cn(1:20,:)';
+X = [cn(1:12,:)'; cnPink(1:12,:)'; ...
+    cnBrown(1:12,:)'; cnWhite(1:12,:)'];
 
 %% LBG Algo:
 K = 7;
-thres_distortion = 0.03;
+thres_distortion = 0.03; % 0.05
 
-initial_centroids = kMeansInitCentroids(X, K);
+initial_centroids = initiateTheHood(X, K);
 [centroids, idx, distortion] = runLBG(X, initial_centroids, ...
     thres_distortion, true);
 

@@ -13,8 +13,11 @@ M = round(N*2/3); % overlap length for stft()
 
 % Step 0: Get file
 [s10, fs10] = getFile(10);
-[s2, fs2] = getFile(2);
 [s7, fs7] = getFile(7);
+[s6, fs6] = getFile(6);
+[s5, fs5] = getFile(5);
+[s4, fs4] = getFile(4);
+[s2, fs2] = getFile(2);
 
 %plot(0:length(t)-1, abs(fft(s)))
 %sound(s10, fs10)
@@ -23,7 +26,7 @@ M = round(N*2/3); % overlap length for stft()
 %plotTime(s10, fs10)
 
 %plotTime(cropZero(s10), fs10)
-plotTime(cropZero(s2), fs2)
+%plotTime(cropZero(s2), fs2)
 
 
 %% Start MFCC
@@ -44,8 +47,8 @@ normCN7 = cn7 ./ max(max(abs(cn7)));
 X2 = normCN2(1:12,:)';
 X7 = normCN2(1:12,:)';
 X10 = normCN10(1:12,:)';
-%figure
 
+% Plots
 figure
 plot(cn2(6,:)', cn2(7,:)', 'x')
 hold on
@@ -54,28 +57,28 @@ xlabel('mfcc-6'); ylabel('mfcc-7')
 
 
 %% =================== Part 3: K-Means Clustering ======================
-K = 3;%7;
-initial_centroids = initiateTheHood(X2, K);
-thres_distortion = 0.03;
-
-% Run K-Means algorithm. The 'true' at the end tells our function to plot
-% the progress of K-Means
-[centroids2, idx2, distortion2] = runLBG(X2, initial_centroids, ...
-    thres_distortion, true);
-
-initial_centroids = initiateTheHood(X10, K);
-[centroids10, idx10, distortion10] = runLBG(X10, initial_centroids, ...
-    thres_distortion, true);
-
-initial_centroids = initiateTheHood(X7, K);
-[centroids7, idx7, distortion7] = runLBG(X7, initial_centroids, ...
-    thres_distortion, true);
-
-%tScore = tPrime(centroids2, centroids10, distortion2, distortion10)
-fprintf('\nK-Means Done.\n\n');
-
-fprintf('Program paused. Press enter to continue.\n');
-pause;
+% K = 3;%7;
+% initial_centroids = initiateTheHood(X2, K);
+% thres_distortion = 0.03;
+% 
+% % Run K-Means algorithm. The 'true' at the end tells our function to plot
+% % the progress of K-Means
+% [centroids2, idx2, distortion2] = runLBG(X2, initial_centroids, ...
+%     thres_distortion, true);
+% 
+% initial_centroids = initiateTheHood(X10, K);
+% [centroids10, idx10, distortion10] = runLBG(X10, initial_centroids, ...
+%     thres_distortion, true);
+% 
+% initial_centroids = initiateTheHood(X7, K);
+% [centroids7, idx7, distortion7] = runLBG(X7, initial_centroids, ...
+%     thres_distortion, true);
+% 
+% %tScore = tPrime(centroids2, centroids10, distortion2, distortion10)
+% fprintf('\nK-Means Done.\n\n');
+% 
+% fprintf('Program paused. Press enter to continue.\n');
+% pause;
 
 %% Finding Optimal Number of Clusters Value
 % X2 = normCN2(1:20,:)';
@@ -118,6 +121,9 @@ pause;
 % title(strcat('K = ', ...
 %     num2str(K) ) );
 % 
+
+%% Find Optimal Tuning Parameters
+
 
 %% File IO Functions
 function [s, fs, t] = getFile(id)

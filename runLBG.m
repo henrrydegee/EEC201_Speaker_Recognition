@@ -85,10 +85,10 @@ while (1)
     end
     
     % Given the memberships, compute new centroids
-    centroids = GoToMyHood(X, centroids, idx, K);
+    centroids = GoToMyHood(X, idx, K);
     
     % LBG Algorithm :
-    curr_distortion = ThisTheHouse(X, idx, centroids, K);
+    curr_distortion = ThisTheHouse(X, idx, centroids);
     compare_distortion = abs( (prev_distortion-curr_distortion) ...
         /curr_distortion);
     fprintf('My brudders are %d far away \n', curr_distortion);
@@ -138,7 +138,7 @@ function idx = findMyHood(X, centroids)
 end
 
 %% GoToMyHood() defintion
-function centroids = GoToMyHood(X, prev_centroids, idx, K)
+function centroids = GoToMyHood(X, idx, K)
 %GoToMyHood finds the new centroids' location by computing 
 %the means of the data points assigned to each centroid.
 %
@@ -166,18 +166,18 @@ function centroids = GoToMyHood(X, prev_centroids, idx, K)
 end
 
 %% ThisTheHouse() Defintion
-function distortion = ThisTheHouse(X, idx, centroids, K)
+function distortion = ThisTheHouse(X, idx, centroids)
 %Computes the mean distortion (error) around the cluster assigned
 %Inputs:
 %   X - [m*n] input matrix containing m-samples and n-number of features
 %   idx - [m*1] matrix containing each centroid membership on m-samples
 %   centroids - [K*n] matrix containing K-number of centroids
 %               on a n-dimensional space (feature space)
-%   K - number of centroids
 %Outputs:
 %   distortion - the mean distance of each cluster's assigned data points
 
     distortion = 0;
+    K = size(centroids, 1);
     for clster = 1:K
         sel = find(idx == clster);
         diff = bsxfun(@minus, X(sel, :), centroids(clster,:));

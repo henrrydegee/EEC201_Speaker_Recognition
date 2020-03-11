@@ -1,7 +1,8 @@
-function dataTable = train42(sound, fs, name, inputDic)
+function dataTable = train42(sound, fs, name, inputDic, ...
+    plot_learning, noise, N, p, pTrain, M, K, thres_distortion)
 %train42 intellectually finds the sound's codebook by
-%finding the lazy/Principle of Least Action method despite
-%the noise "42" likes to make. 42 then saves it to a table
+%using the LBG method despite the noise "42" likes to make. 
+%42 then saves it to a table
 %that only 42 or MATLAB can comprehend.
 %
 %Inputs:
@@ -13,39 +14,56 @@ function dataTable = train42(sound, fs, name, inputDic)
 %
 %Outputs:
 %   dataTable - Updated table of saved codebooks
+%
+%Inputs for Tuning Purposes (can be left blank for default):
+% |  plot_learning - Bool (T/F) T -> Show K-Clustering in Action
+% |  noise - Add Noisy Datapoints to Dataset (for Training Purposes)
+% |  N - Number of elements in Hamming window for stft()
+% |  p - Number of filters in the filter bank for melfb
+% |  pTrain - Number of filters to train on (from 1:pTrain)
+% |  M - overlap length for stft() for more samples
+% |  K - Number of Clusters
+% |  thres_distortion - Threshold quantified by how much variance
+% |     has been reduced between previous centroids and current centroids
+% |
+% |-Note: Please refer to code for its default values   
+%
 %   
 
-%% Variables
-N = 200; % Number of elements in Hamming window for stft()
-p = 20; % Number of filters in the filter bank for melfb
+%% Default Variables
+if ~exist('plot_learning', 'var') || isempty(plot_learning)
+    plot_learning = true;
+end
+if ~exist('noise', 'var') || isempty(noise)
+    noise = true;
+end
+if ~exist('N', 'var') || isempty(N)
+    N = 200; % Number of elements in Hamming window for stft()
+end
+if ~exist('p', 'var') || isempty(p)
+    p = 20; % Number of filters in the filter bank for melfb
+end
+if ~exist('pTrain', 'var') || isempty(pTrain)
+    pTrain = 12; % Number of filters to train on (from 1:pTrain)
+end
+if ~exist('M', 'var') || isempty(M)
+    M = round(N*2/3); % overlap length for stft()
+end
+if ~exist('K', 'var') || isempty(K)
+    K = 7;  % Number of Clusters
+end
+if ~exist('thres_distortion', 'var') || isempty(thres_distortion)
+    thres_distortion = 0.03; % Or 0.05
+end
 
-M = round(N*2/3); % overlap length for stft()
 
-%% Other Possible Datasets to train on
-sPink = addNoise(cropZero(sound), 'pink');
-sBrown = addNoise(cropZero(sound), 'brown');
-sWhite = addNoise(cropZero(sound), 'white');
-
-%% Do MFCC
-[cn, ystt] = mfcc(cropZero(sound), fs, N, p, M, true);
-
-[cnPink, ystt] = mfcc(sPink, fs, N, p, M, true);
-[cnBrown, ystt] = mfcc(sBrown, fs, N, p, M, true);
-[cnWhite, ystt] = mfcc(sWhite, fs, N, p, M, true);
-
-
-%normCN = cn ./ max(max(abs(cn)));
-%X = normCN(1:12,:)';
-X = [cn(1:12,:); cnPink(1:12,:); ...
-    cnBrown(1:12,:); cnWhite(1:12,:)]';
+%% Preperation for LBG Algo:
+X = prepareTheHood(sound, fs, N, p, pTrain, M, true, noise);
 
 %% LBG Algo:
-K = 7;
-thres_distortion = 0.03;
-
-initial_centroids = kMeansInitCentroids(X, K);
+initial_centroids = initiateTheHood(X, K);
 [centroids, idx, distortion] = runLBG(X, initial_centroids, ...
-    thres_distortion, true);
+    thres_distortion, plot_learning);
 
 %% Save to Table
 centroids_cell = {centroids};

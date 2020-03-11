@@ -1,9 +1,13 @@
-function centroids = kMeansInitCentroids(X, K)
-%KMEANSINITCENTROIDS This function initializes K centroids that are to be 
-%used in K-Means on the dataset X
-%   centroids = KMEANSINITCENTROIDS(X, K) returns K initial centroids to be
-%   used with the K-Means on the dataset X
+function centroids = initiateTheHood(X, K)
+%initiateTheHood assigns K centroids into a randomly chosen
+%data point found in X matrix
 %
+% Inputs:
+%   X - [m*n] matrix containing m-samples and n-number of features
+%   K - Number of Clusters
+% Output:
+%   centroids - [K*n] matrix containing K-number of centroids
+%               on a n-dimensional space (feature space)
 
 
 % Initialize the centroids to be random examples

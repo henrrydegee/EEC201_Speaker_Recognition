@@ -1,19 +1,35 @@
-%% LBG Algorithm:
-% Inspired by Run-TMC and Run-DMC
 function [centroids, idx, curr_distortion] = runLBG(X, initial_centroids, ...
                                       thres_distortion, plot_progress)
-%RUNKMEANS runs the K-Means algorithm on data matrix X, where each row of X
-%is a single example
-%   [centroids, idx] = RUNKMEANS(X, initial_centroids, max_iters, ...
-%   plot_progress) runs the K-Means algorithm on data matrix X, where each 
-%   row of X is a single example. It uses initial_centroids used as the
-%   initial centroids. max_iters specifies the total number of interactions 
-%   of K-Means to execute. plot_progress is a true/false flag that 
-%   indicates if the function should also plot its progress as the 
-%   learning happens. This is set to false by default. runkMeans returns 
-%   centroids, a Kxn matrix of the computed centroids and idx, a m x 1 
-%   vector of centroid assignments (i.e. each entry in range [1..K])
+%% LBG Algorithm:
+%   |- Inspired by Run-TMC and Run-DMC
 %
+%runLBG() performs the LBG Algorithm by performing k-Clustering
+%iteratively until a variance/disortion threshold has been met.
+%
+%K-Clustering: A Vector Quantization Method by classifying m data
+%points/observations into K clusters through the nearest mean.
+%
+% Assumptions:
+% Euclidean Distance is used to calculate the Cluster's
+% Varaiance/Distortion
+%
+% Input:
+%   X - Input Data Points' Matrix (m*f)
+%       |- m = Number of Observations/Data Points
+%       |- n = Dimension Size of Observation / Number of Features
+%   initial_centroids - Matrix (K*n) containing Centroid points
+%       |- K = Number of Clusters to Partition
+%       |- n = Dimension Size of Cluster Points
+%   thres_distortion - Threshold quantified by how much variance
+%       has been reduced between previous centroids and current centroids
+%       |- Note: Default has been set to 0.05
+%   plot_progress - (From Coursera) Live Demo of K-Clustering Algorithm
+%
+% Outputs:
+%   centroids - [K*n] matrix containing K-number of centroids
+%               on a n-dimensional space (feature space)
+%   idx - [m*1] matrix containing each centroid membership on m-samples
+%   curr_distortion - Total Variance of each centroid's distortion/variance
 
 % Set default value for plot progress
 if ~exist('plot_progress', 'var') || isempty(plot_progress)
@@ -69,10 +85,10 @@ while (1)
     end
     
     % Given the memberships, compute new centroids
-    centroids = GoToMyHood(X, centroids, idx, K);
+    centroids = GoToMyHood(X, idx, K);
     
     % LBG Algorithm :
-    curr_distortion = ThisTheHouse(X, idx, centroids, K);
+    curr_distortion = ThisTheHouse(X, idx, centroids);
     compare_distortion = abs( (prev_distortion-curr_distortion) ...
         /curr_distortion);
     fprintf('My brudders are %d far away \n', curr_distortion);
@@ -105,9 +121,7 @@ function idx = findMyHood(X, centroids)
 
     % Set K
     K = size(centroids, 1);
-
     idx = zeros(size(X,1), 1);
-
     distance = zeros(size(X, 1), K);
 
     for i = 1:K
@@ -124,7 +138,7 @@ function idx = findMyHood(X, centroids)
 end
 
 %% GoToMyHood() defintion
-function centroids = GoToMyHood(X, prev_centroids, idx, K)
+function centroids = GoToMyHood(X, idx, K)
 %GoToMyHood finds the new centroids' location by computing 
 %the means of the data points assigned to each centroid.
 %
@@ -152,18 +166,18 @@ function centroids = GoToMyHood(X, prev_centroids, idx, K)
 end
 
 %% ThisTheHouse() Defintion
-function distortion = ThisTheHouse(X, idx, centroids, K)
+function distortion = ThisTheHouse(X, idx, centroids)
 %Computes the mean distortion (error) around the cluster assigned
 %Inputs:
 %   X - [m*n] input matrix containing m-samples and n-number of features
 %   idx - [m*1] matrix containing each centroid membership on m-samples
 %   centroids - [K*n] matrix containing K-number of centroids
 %               on a n-dimensional space (feature space)
-%   K - number of centroids
 %Outputs:
 %   distortion - the mean distance of each cluster's assigned data points
 
     distortion = 0;
+    K = size(centroids, 1);
     for clster = 1:K
         sel = find(idx == clster);
         diff = bsxfun(@minus, X(sel, :), centroids(clster,:));

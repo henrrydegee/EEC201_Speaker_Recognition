@@ -122,19 +122,6 @@ xlabel('mfcc-6'); ylabel('mfcc-7')
 %     num2str(K) ) );
 % 
 
-%% Find Optimal Tuning Parameters
-
-
-%% File IO Functions
-function [s, fs, t] = getFile(id)
-    % Reads from ./Data to fetch the file
-    id_str = string( strcat('./Data/s', int2str(id), '.wav') );
-    [s, fs] = audioread(id_str);
-    t = (0:length(s)-1) / fs;
-    if min(size(s)) > 1
-        s = s(:, 1); % If more channel, get only first
-    end
-end
 
 %% Plot Functions
 function plotTime(s, fs)
@@ -173,36 +160,3 @@ function y = ampNorm(s)
     k = 1 / max(abs(s)); % Gain Factor
     y = k * s; % Multiply
 end
-
-function y = cropZero(s)
-    % Deletes the leading and ending zeros
-    % TODO: tweak sensitivity, possibly calc dB
-    
-    s2 = round(s, 3); % sensitivity 
-    cri = abs(s2) > db2mag(-30);
-    y = s(find(cri, 1, 'first'):find(cri, 1, 'last')); % crop
-
-end
-
-%% Signal Generator
-function xn = fseries(f1, f2, n, fs, step)
-% Generates Fourier Series with given frequencies
-% Input:
-% f1 = Starting Frequency
-% f2 = Ending Frequency
-% n = Time Domain / Domain of Signal
-% fs = Sampling Frequency
-% step = Steps between the consecutive frequencies
-% Output:
-% xn = x[n] Fourier Series
-
-    xn = 0;     % Initialization of x[n]
-    for f = f1:step:f2    % Fourier Series frequency
-        xn = xn + sin( 2.*pi.*f.* (n ./fs) ) ;%...
-            %+ cos( 2.*pi.*f.* (n ./fs) );
-        if ( f > 1)
-            xn = xn * 100 ./ (f);
-        end
-    end
-end
-

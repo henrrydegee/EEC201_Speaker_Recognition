@@ -64,16 +64,16 @@ title(strcat('Threshold = ', ...
     num2str(thres_distortion) ) );
 
 %% Finding Optimal Number of MFCC-Coefficient
-p = 22;
+p = 32;
 maxPtrain = p;
-pTrainAcc = zeros(size(minP:maxP, 1),1);
+pTrainAcc = zeros(size(2:maxPtrain, 1),1);
 for pTrain = 2:maxPtrain
     pDic = getTrainDic(true, N, p, pTrain, M, K, thres_distortion);
     [pMat, pTrainAcc(pTrain-1, 1)] = getTestDic(pDic, N, p, pTrain, M);
 end
 
 figure
-plot(2:maxPtrain, pAcc); hold on;
+plot(2:maxPtrain, pTrainAcc); hold on;
 grid on
 xlabel('Number of MFCC Used'); ylabel('Accuracy');
 title(strcat('Threshold = ', ...

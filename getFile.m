@@ -9,7 +9,7 @@ function [s, fs, t] = getFile(id)
     % fs - Sampling Frequency (in Hz)
     % t - Time array given the Sampling Frequency
     
-    id_str = string( strcat('./Data/s', int2str(id), '.wav') );
+    id_str = string( strcat('./Data/train/s', int2str(id), '.wav') );
     [s, fs] = audioread(id_str);
     t = (0:length(s)-1) / fs;
     if min(size(s)) > 1

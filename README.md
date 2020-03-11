@@ -8,8 +8,11 @@ coefficients, vector quantization and k-clustering.
 ## Completed Milestones
 1. Mel-Frequency Cepstrum Coefficients
 2. Vector Quantization
+3. k-clustering
+4. Set up GUI
 
 ## Next Steps
-1. k-clustering
-2. Integrate with GUI
-3. Website + Report
+1. Tweak parameters
+2. Report
+
+###### Last Updated: March 11, 2020

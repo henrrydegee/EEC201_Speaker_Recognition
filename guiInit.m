@@ -5,7 +5,7 @@ function board = guiInit()
 % Set UI Window Size
 screen = get(0, 'ScreenSize');
 x0 = screen(3)/2-400; y0 = screen(4)/2-200;
-board.fig = figure('Name', "Team 42: Speaker Recognition GUI", ...
+board.fig = figure('Name', "Team 42: Speaker Recognition GUI - Speak Louder Please", ...
     'NumberTitle', 'off', 'position', [x0, y0, 700, 250]);
 set(board.fig, 'Color', [1,1,1]);
 

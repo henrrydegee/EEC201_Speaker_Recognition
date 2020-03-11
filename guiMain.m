@@ -9,6 +9,7 @@ global recObj isTrain spkName board Fs path inputDic
 isTrain = 1;
 spkName = "Name";
 path = './Data/';
+inputDic = getInputDic();
 
 %% Initialize
 board = guiInit();
@@ -27,14 +28,16 @@ function processSound(s, fs)
     
     if isTrain
         % Send to train
-        inputDic = train42(s, fs, spkName, inputDic);
+        setOutText(string(strcat("Training for: ", spkName)));
+        inputDic = train42(s, fs, spkName, inputDic, false);
         setOutText(string(strcat("Trained: ", spkName)));
     else
         % Send to find speaker
         outSpkr = test42(s, fs, inputDic);
         isValid = 1; % TODO: get validity of speaker
         if isValid
-            setOutText(['Speaker is: ', outSpkr]);
+            otxt = string(strcat("Speaker is: ", outSpkr));
+            setOutText(otxt);
         else
             setOutText(["Match not found."]);
         end
@@ -74,6 +77,7 @@ function namFie(hObj, ~, ~)
     global spkName
     spkName = get(hObj, 'String');
     setOutText(['Set name to: ' spkName]);
+    spkName = string(spkName);
 end
 
 function patFie(hObj, ~, ~)

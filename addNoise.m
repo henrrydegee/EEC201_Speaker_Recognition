@@ -11,12 +11,12 @@ function sOutput = addNoise(sInput, typeNoise)
 sInput = ampScale(sInput, 0.5);
 
 % Get noise
-typeNoise = 'brown'; % type of noise
+% typeNoise = 'brown'; % type of noise
 samp = length(sInput); % number of samples / length
 numChan = 1; % number of channels
 
 % bounded output
-if (typeNoise == 'brown')
+if (typeNoise == "brown")
     bOut = false;
 else
     bOut = true;
@@ -24,11 +24,14 @@ end
 fNoise = dsp.ColoredNoise(typeNoise, samp, numChan, 'BoundedOutput', bOut);
 noiseOut = fNoise(); % get noise from generator
 
-if (typeNoise == 'brown')
-    noiseOut = 0.02 .* noiseOut;
+if (typeNoise == "brown")
+    noiseOut = 0.01 .* noiseOut;
+elseif (typeNoise == "white")
+    noiseOut = ampScale(noiseOut, 0.1);
 else
-    noiseOut = ampScale(noiseOut, 0.5);
+    noiseOut = ampScale(noiseOut, 0.3);
 end
+
 
 
 % % Plot

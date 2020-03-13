@@ -27,10 +27,10 @@ function [name, confident, spkIdx, distort_compare] = test42(sound, fs, ...
 
 %% Default Variables
 if ~exist('rValid', 'var') || isempty(rValid)
-    rValid = 0.6; % Error Deviation Tolerance to validate speaker
+    rValid = 0.2; % Error Deviation Tolerance to validate speaker
 end
 if ~exist('N', 'var') || isempty(N)
-    N = 200; % Number of elements in Hamming window for stft()
+    N = 248; % Number of elements in Hamming window for stft()
 end
 if ~exist('p', 'var') || isempty(p)
     p = 20; % Number of filters in the filter bank for melfb

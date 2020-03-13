@@ -39,6 +39,8 @@ function forwardSound(s, fs)
             setOutText(otxt);
         else
             setOutText(["Match not found."]);
+            % For False Positive Testing Purposes:
+            %fprintf(string(strcat("Speaker is: ", outSpkr)));
         end
     end
 end

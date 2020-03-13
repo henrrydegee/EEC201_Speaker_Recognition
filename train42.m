@@ -38,7 +38,7 @@ if ~exist('noise', 'var') || isempty(noise)
     noise = false;
 end
 if ~exist('N', 'var') || isempty(N)
-    N = 200; %256; % Number of elements in Hamming window for stft()
+    N = 248; % Number of elements in Hamming window for stft()
 end
 if ~exist('p', 'var') || isempty(p)
     p = 20; % Number of filters in the filter bank for melfb

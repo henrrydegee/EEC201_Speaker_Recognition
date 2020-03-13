@@ -23,7 +23,7 @@ inputDic = train42(s10, fs10, "s10", inputDic);
 %close all
 [noise, rValid, N, p, pTrain, M, K, thres_distortion, numTrials] ...
     = defaultParameters;
-maxK = 96;
+maxK = 64;
 distortions = zeros(maxK, 1);
 
 for K = 1:maxK
@@ -36,7 +36,7 @@ for K = 1:maxK
     distortions(K, 1) = tryK.distortion_cell{K, 1};
 end
 
-%figure
+figure
 plot( (1:maxK)', distortions); hold on;
 grid on
 xlabel('Number of K-Cluster'); ylabel('Distortion Loss');
@@ -69,21 +69,20 @@ legend("Training Dataset (Cross-Validation)", "Test Dataset");
 [noise, rValid, N, p, pTrain, M, K, thres_distortion, numTrials] ...
     = defaultParameters;
 maxN = 1024;
-row = size(192:2:maxN, 1);
+row = size(192:8:maxN, 1);
 NAccTrain = zeros(row,1);
 NAccTest = zeros(row,1);
 nIdx = 1;
-for N = 192:2:maxN
+for N = 192:8:maxN
     M = round(N*2/3); % overlap length for stft()
-    nDic = getInputDic(true, N, p, pTrain, M, K, thres_distortion);
     [NAccTrain(nIdx, 1), NAccTest(nIdx, 1)] = ...
         benchmark(numTrials, noise, N, p, pTrain, M, K, thres_distortion);
     nIdx = nIdx +1;
 end
 
 figure
-plot(192:2:maxN, NAccTrain); hold on;
-plot(192:2:maxN, NAccTest);
+plot(192:8:maxN, NAccTrain); hold on;
+plot(192:8:maxN, NAccTest);
 grid on
 xlabel('Hamming Window Size'); ylabel('Accuracy');
 title("Accuracy Metrics" );

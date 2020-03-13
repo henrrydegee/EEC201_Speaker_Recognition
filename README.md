@@ -15,4 +15,4 @@ coefficients, vector quantization and k-clustering.
 1. Tweak parameters
 2. Report
 
-###### Last Updated: March 11, 2020
+###### Last Updated: March 13, 2020

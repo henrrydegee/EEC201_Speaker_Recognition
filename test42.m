@@ -1,5 +1,5 @@
-function [name, spkIdx, distort_compare] = test42(sound, fs, inputDic, ...
-    N, p, pTrain, M)
+function [name, confident, spkIdx, distort_compare] = test42(sound, fs, ...
+    inputDic, rValid, N, p, pTrain, M)
 %test42 tries to recognize the speaker in the sound
 %array given the inputDic of codebooks
 %
@@ -9,12 +9,15 @@ function [name, spkIdx, distort_compare] = test42(sound, fs, inputDic, ...
 %   inputDic - Table of previously saved codebooks
 %
 %Output:
-%   name - Name of the Speaker seen in inputDic
-%   spkIdx - Speaker Index at inputDic Table
-%   distort_compare - distance/distortion between Input Sound Data
-%       and inputDic's centroids
+%   name - (string) Name of the Speaker seen in inputDic
+%   confident - Boolean (T/F) -> True: Valid Speaker
+%   spkIdx - (int) Speaker Index at inputDic Table
+%   distort_compare - (numSpkr*1) distance/distortion between
+%       Input Sound Data and inputDic's centroids
 %
 %Inputs for Tuning Purposes (can be left blank for default):
+% |  rValid - Error Deviation between best and second best
+% |     predicted speaker (Refer to the Code for more details)
 % |  N - Number of elements in Hamming window for stft()
 % |  p - Number of filters in the filter bank for melfb
 % |  pTrain - Number of filters to train on (from 1:pTrain)
@@ -23,6 +26,9 @@ function [name, spkIdx, distort_compare] = test42(sound, fs, inputDic, ...
 %
 
 %% Default Variables
+if ~exist('rValid', 'var') || isempty(rValid)
+    rValid = 0.6; % Error Deviation Tolerance to validate speaker
+end
 if ~exist('N', 'var') || isempty(N)
     N = 200; % Number of elements in Hamming window for stft()
 end
@@ -30,7 +36,7 @@ if ~exist('p', 'var') || isempty(p)
     p = 20; % Number of filters in the filter bank for melfb
 end
 if ~exist('pTrain', 'var') || isempty(pTrain)
-    pTrain = 12; % Number of filters to train on (from 1:pTrain)
+    pTrain = 13; % Number of filters to train on (from 1:pTrain)
 end
 if ~exist('M', 'var') || isempty(M)
     M = round(N*2/3); % overlap length for stft()
@@ -50,8 +56,17 @@ for entre = 1:size(inputDic, 1)
 end
 
 %% Finding the speaker
-[dummy, spkIdx] = min(distort_compare);
+distort_sorted = sort(distort_compare);
+spkIdx = find(distort_compare == distort_sorted(1));
+delta_distort = abs(distort_sorted(2) - distort_sorted(1));
+if ( delta_distort ./ distort_sorted(1) < rValid)
+    confident = false;
+else
+    confident = true;
+end
+%[dummy, spkIdx] = min(distort_compare);
 name = inputDic(spkIdx, :).Properties.RowNames;
+name = string(name); % Cast from cell to string
 
 end
 

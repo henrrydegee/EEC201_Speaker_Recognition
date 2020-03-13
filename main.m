@@ -25,8 +25,10 @@ M = round(N*2/3); % overlap length for stft()
 %sound(cropZero(s10), fs10)
 %plotTime(s10, fs10)
 
-%plotTime(cropZero(s10), fs10)
-%plotTime(cropZero(s2), fs2)
+plotTime(cropZero(s10), fs10)
+plotTime(cropZero(s2), fs2)
+plotTime(cropZero(s5), fs5)
+plotTime(cropZero(s6), fs6)
 
 
 %% Start MFCC
@@ -34,10 +36,10 @@ M = round(N*2/3); % overlap length for stft()
 [cn2, ystt2] = mfcc(cropZero(s2), fs2, N, p, M);
 [cn7, ystt7] = mfcc(cropZero(s7), fs7, N, p, M);
 
-% % Step 5: Plot the amplitude output of the dct
-% plotMFCC(ystt10, cn10./ max(max(abs(cn10))), p, 10)
-% plotMFCC(ystt2, cn2 ./ max(max(abs(cn2))), p, 2)
-% plotMFCC(ystt7, cn7 ./ max(max(abs(cn7))), p, 7)
+% Step 5: Plot the amplitude output of the dct
+plotMFCC(ystt10, cn10./ max(max(abs(cn10))), p, 10)
+plotMFCC(ystt2, cn2 ./ max(max(abs(cn2))), p, 2)
+plotMFCC(ystt7, cn7 ./ max(max(abs(cn7))), p, 7)
 
 %% Prepare for k-Clustering
 normCN10 = cn10 ./ max(max(abs(cn10)));
@@ -50,10 +52,13 @@ X10 = normCN10(1:12,:)';
 
 % Plots
 figure
-plot(cn2(6,:)', cn2(7,:)', 'x')
+plot(normCN2(6,:)', normCN2(7,:)', 'x')
 hold on
-plot(cn10(6,:)', cn10(7,:)', 'o')
+plot(normCN10(6,:)', normCN10(7,:)', 'o')
 xlabel('mfcc-6'); ylabel('mfcc-7')
+legend("Speaker 2", "Speaker 10")
+grid on
+title("mfcc space")
 
 
 %% =================== Part 3: K-Means Clustering ======================

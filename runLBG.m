@@ -68,7 +68,7 @@ while (1)
 %         fflush(stdout);
 %     end
     
-    fprintf("LBG still be runnin' ...\n");
+    %fprintf("LBG still be runnin' ...\n");
     if exist('OCTAVE_VERSION')
         fflush(stdout);
     end
@@ -80,7 +80,6 @@ while (1)
     if plot_progress
         plotProgresskMeans(X, centroids, previous_centroids, idx, K, i);
         previous_centroids = centroids;
-        fprintf('Press enter to continue.\n');
         pause(0.25);
     end
     
@@ -91,9 +90,9 @@ while (1)
     curr_distortion = ThisTheHouse(X, idx, centroids);
     compare_distortion = abs( (prev_distortion-curr_distortion) ...
         /curr_distortion);
-    fprintf('My brudders are %d far away \n', curr_distortion);
+    %fprintf('My brudders are %d far away \n', curr_distortion);
     if ( compare_distortion < thres_distortion )
-        fprintf("I'm home brudder :D \n");
+        %fprintf("I'm home brudder :D \n");
         break
     end
     prev_distortion = curr_distortion;

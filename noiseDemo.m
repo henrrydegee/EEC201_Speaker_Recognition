@@ -2,32 +2,21 @@
 clear; close all;
 
 % Get sample
-[s, Fs] = getFile(10);
-s = ampScale(s, 0.5);
+[s, fs] = getFile(10);
 
 % Get noise
 typeNoise = 'white'; % type of noise
-samp = length(s); % number of samples / length
-numChan = 1; % number of channels
-bOut = true; % bounded output
-fNoise = dsp.ColoredNoise(typeNoise, samp, numChan, 'BoundedOutput', bOut);
-noiseOut = fNoise(); % get noise from generator
-noiseOut = ampScale(noiseOut, 0.2);
+dbNoise = -25; % dB from signal
+[sn, noise] = addNoise(s, typeNoise, dbNoise);
 
 % Plot
-t = (0:length(s)-1)/Fs;
-figure; plot(t, s, t, noiseOut);
+t = (0:length(s)-1)/fs;
+figure; subplot(2, 1, 1); plot(t, s); subplot(2, 1, 2); plot(t, sn);
 
 % Add noise and play
-s = s + noiseOut;
-p = audioplayer(s, Fs);
+p = audioplayer(sn, fs);
 play(p);
 
-% Function to scale signal
-function y = ampScale(s, k)
-    if nargin == 1
-        k = 1/2;
-    end
-    k = k / max(abs(s)); % Gain Factor
-    y = k * s; % Multiply
-end
+% Analyze SNR
+R = snr(s, noise);
+fprintf("SNR = %.3fdB\n", R);

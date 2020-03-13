@@ -16,17 +16,14 @@ inputDic = train42(s10, fs10, "s10", inputDic);
 
 
 %% Default Variables
-    N = 200; % Number of elements in Hamming window for stft()
-    p = 20; % Number of filters in the filter bank for melfb
-    pTrain = 12; % Number of filters to train on (from 1:pTrain)
-    M = round(N*2/3); % overlap length for stft()
-    K = 7;  % Number of Clusters
-    thres_distortion = 0.03; % Or 0.05
+[noise, rValid, N, p, pTrain, M, K, thres_distortion, numTrials] ...
+    = defaultParameters;
 
-%% Finding Optimal Number of Clusters
+%% Finding Optimal Number of Clusters (Distortion Method)
 %close all
-
-maxK = 25;
+[noise, rValid, N, p, pTrain, M, K, thres_distortion, numTrials] ...
+    = defaultParameters;
+maxK = 96;
 distortions = zeros(maxK, 1);
 
 for K = 1:maxK
@@ -46,30 +43,115 @@ xlabel('Number of K-Cluster'); ylabel('Distortion Loss');
 title(strcat('Threshold = ', ...
     num2str(thres_distortion) ) );
 
-%% Finding Optimal Number of Filter Banks
-maxP = 45;
-minP = 15;
-pTrain = 12;
-pAcc = zeros(size(minP:maxP, 1),1);
-for p = minP:maxP
-    pDic = getInputDic(true, N, p, pTrain, M, K, thres_distortion);
-    [pMat, pAcc(p-(minP-1), 1)] = getTestDic(pDic, N, p, pTrain, M);
+%% Finding Optimal Number of Clusters (Accuracy Method)
+%close all
+[noise, rValid, N, p, pTrain, M, K, thres_distortion, numTrials] ...
+    = defaultParameters;
+maxK = 64;
+accKTrain = zeros(maxK, 1);
+accKTest = zeros(maxK, 1);
+
+
+for K = 1:maxK
+    [accKTrain(K,1), accKTest(K,1)] = benchmark(numTrials, noise, N, p, ...
+    pTrain, M, K, thres_distortion);
 end
 
 figure
-plot(minP:maxP, pAcc); hold on;
+plot( (1:maxK)', accKTrain); hold on;
+plot( (1:maxK)', accKTest);
+grid on
+xlabel('Number of K-Cluster'); ylabel('Accuracy');
+title("Accuracy Metrics" );
+legend("Training Dataset (Cross-Validation)", "Test Dataset");
+
+%% Finding Optimal Number of Windowing
+[noise, rValid, N, p, pTrain, M, K, thres_distortion, numTrials] ...
+    = defaultParameters;
+maxN = 1024;
+row = size(192:2:maxN, 1);
+NAccTrain = zeros(row,1);
+NAccTest = zeros(row,1);
+nIdx = 1;
+for N = 192:2:maxN
+    M = round(N*2/3); % overlap length for stft()
+    nDic = getInputDic(true, N, p, pTrain, M, K, thres_distortion);
+    [NAccTrain(nIdx, 1), NAccTest(nIdx, 1)] = ...
+        benchmark(numTrials, noise, N, p, pTrain, M, K, thres_distortion);
+    nIdx = nIdx +1;
+end
+
+figure
+plot(192:2:maxN, NAccTrain); hold on;
+plot(192:2:maxN, NAccTest);
+grid on
+xlabel('Hamming Window Size'); ylabel('Accuracy');
+title("Accuracy Metrics" );
+legend("Training Dataset (Cross-Validation)", "Test Dataset");
+
+%% Finding Optimal Number of Filter Banks
+[noise, rValid, N, p, pTrain, M, K, thres_distortion, numTrials] ...
+    = defaultParameters;
+maxP = 45;
+minP = 12;
+% pTrain = 12;
+pAccTrain = zeros(size(minP:maxP, 1),1);
+pAccTest = zeros(size(minP:maxP, 1),1);
+for p = minP:maxP
+    pTrain = round(p*2/3); % Always get approx 66% of Filter Banks
+    [pAccTest(p-(minP-1), 1), pAccTest(p-(minP-1), 1)] = ...
+        benchmark(numTrials, noise, N, p, pTrain, M, K, thres_distortion);
+end
+
+figure
+plot(minP:maxP, pAccTrain); hold on;
+plot(minP:maxP, pAccTest);
 grid on
 xlabel('Number of Filter Banks'); ylabel('Accuracy');
-title(strcat('Threshold = ', ...
-    num2str(thres_distortion) ) );
+title("Accuracy Metrics" );
+legend("Training Dataset (Cross-Validation)", "Test Dataset");
 
-%% Finding Optimal Number of MFCC-Coefficient
-p = 45;
+%% Finding Optimal Number of MFCC-Coefficient (Accuracy Only)
+[noise, rValid, N, p, pTrain, M, K, thres_distortion, numTrials] ...
+    = defaultParameters;
+p = 20;
 maxPtrain = p;
-pTrainAcc = zeros(size(2:maxPtrain, 1),1);
+row = size(2:maxPtrain, 1);
+pTrainAccTrain = zeros(row,1);
+pTrainAccTest = zeros(row,1);
+
+for pTrain = 2:maxPtrain
+    [pTrainAccTrain(pTrain-1, 1), pTrainAccTest(pTrain-1, 1)] = ...
+        benchmark(numTrials, noise, N, p, pTrain, M, K, thres_distortion);
+end
+
+figure
+plot(2:maxPtrain, pTrainAccTrain); hold on;
+plot(2:maxPtrain, pTrainAccTest);
+grid on
+xlabel('Number of MFCC Used'); ylabel('Accuracy');
+
+title("Accuracy Metrics" );
+legend("Training Dataset (Cross-Validation)", "Test Dataset");
+
+%% Finding Optimal Number of MFCC-Coefficient w/ Distortion Considerations
+defaultParameters;
+p = 20;
+maxPtrain = p;
+row = size(2:maxPtrain, 1);
+pTrainAcc = zeros(row,1);
+pTrainDistTest = zeros(row ,8); % row == 2:maxPtrain, col == 1:8 (Speaker_id)
+pTrainDistTrain = zeros(row, 8);
+
+
 for pTrain = 2:maxPtrain
     pDic = getInputDic(true, N, p, pTrain, M, K, thres_distortion);
-    [pMat, pTrainAcc(pTrain-1, 1)] = getTestDic(pDic, N, p, pTrain, M);
+    [pMat, pTrainAcc(pTrain-1, 1)] = getTestDic(pDic, rValid, N, p, pTrain, M);
+    for spkr_id = 1:8
+        pTrainDistTest(pTrain-1, spkr_id) = pMat(spkr_id, spkr_id);
+        spkrTrain_Dist = pDic{spkr_id,2}{1,1};
+        pTrainDistTrain(pTrain-1, spkr_id) = spkrTrain_Dist;
+    end
 end
 
 figure
@@ -79,7 +161,28 @@ xlabel('Number of MFCC Used'); ylabel('Accuracy');
 title(strcat('Threshold = ', ...
     num2str(thres_distortion) ) );
 
-% %% Creating Dictionary for Training Tuning
+figure
+plot(2:maxPtrain, pTrainDistTest(1:maxPtrain-1, 5) ); hold on;
+plot(2:maxPtrain, pTrainDistTrain(1:maxPtrain-1, 5) );
+grid on
+xlabel('Number of MFCC Used'); ylabel('Distortion');
+legend("Test Distortion", "Training Distortion")
+
+%% Calling Default Values
+function [noise, rValid, N, p, pTrain, M, K, thres_distortion, numTrials] ...
+    = defaultParameters
+    noise = false; % Adding Noise for training
+    rValid = 2; % (float>1) Ratio for Speaker Validation
+    N = 200; % Number of elements in Hamming window for stft()
+    p = 20; % Number of filters in the filter bank for melfb
+    pTrain = 12; % Number of filters to train on (from 1:pTrain)
+    M = round(N*2/3); % overlap length for stft()
+    K = 16;  % Number of Clusters
+    thres_distortion = 0.003; % Or 0.05
+    numTrials = 25;
+end
+
+%% Creating Dictionary for Training Tuning
 % function trainDic = getInputDic(noise, N, p, pTrain, M, K, thres_distortion)
 % 
 % % Get file
@@ -99,20 +202,21 @@ title(strcat('Threshold = ', ...
 % trainDic = train42(s10, fs10, "s10", trainDic, false, noise, N, p, pTrain, M, K, thres_distortion);
 % end
 
+
 %% Checking Accuracy and Tabulate Distortion Table
-function [testMat, acc] = getTestDic(trainDic, N, p, pTrain, M)
+function [testMat, acc] = getTestDic(trainDic, rValid, N, p, pTrain, M)
 % testMat: Row-> trainDic's Codebook, Col -> Sound File Test
 
 %testMat = zeros(11, pTrain);
-spkIdx = zeros(11, 1);
+spkIdx = zeros(8, 1);
 
-for i = 1:11
-    path = string(strcat("./Data/s", num2str(i), "pink.wav"));
-    [s, fs] = getSoundFromPath(path);
-    [~, spkIdx(i, 1), testMat(i, :)] = test42(s, fs, trainDic, N, p, pTrain, M);
+for i = 1:8
+    [s, fs] = getFile(i, "test");
+    %path = string(strcat("./Data/s", num2str(i), "pink.wav"));
+    [~, ~, spkIdx(i, 1), testMat(i, :)] = test42(s, fs, trainDic, rValid, N, p, pTrain, M);
 end
 
-gtIdx = (1:11)';
+gtIdx = (1:8)';
 
 % [s10, fs10] = getFile(10);
 % [s2, fs2] = getFile(2);

@@ -35,16 +35,16 @@ if ~exist('plot_learning', 'var') || isempty(plot_learning)
     plot_learning = true;
 end
 if ~exist('noise', 'var') || isempty(noise)
-    noise = true;
+    noise = false;
 end
 if ~exist('N', 'var') || isempty(N)
-    N = 200; % Number of elements in Hamming window for stft()
+    N = 200; %256; % Number of elements in Hamming window for stft()
 end
 if ~exist('p', 'var') || isempty(p)
     p = 20; % Number of filters in the filter bank for melfb
 end
 if ~exist('pTrain', 'var') || isempty(pTrain)
-    pTrain = 12; % Number of filters to train on (from 1:pTrain)
+    pTrain = 13; % Number of filters to train on (from 1:pTrain)
 end
 if ~exist('M', 'var') || isempty(M)
     M = round(N*2/3); % overlap length for stft()

@@ -1,50 +1,45 @@
-function sOutput = addNoise(sInput, typeNoise)
-%addNoise() adds coloured noise into the input sound file
-% Inputs:
-% sInput - Sound array
-% typeNoise = {'brown', 'pink', 'white'}
-%
-% Output:
-% sOutput - Sound array with Added Noise
+function [sOutput, noiseOut] = addNoise(sInput, typeNoise, dbNoise)
+    %addNoise() adds coloured noise into the input sound file
+    % Inputs:
+    % sInput - Sound array
+    % dbNoise - dB of noise added from amplitude of sound
+    % typeNoise = {'brown', 'pink', 'white'}
+    %
+    % Output:
+    % sOutput - Sound array with Added Noise
+    % noiseOut - The Noise added to the output
 
-% Scale sample
-sInput = ampScale(sInput, 0.5);
+    SNR_WARN_THRESHOLD = 10; %dB
 
-% Get noise
-% typeNoise = 'brown'; % type of noise
-samp = length(sInput); % number of samples / length
-numChan = 1; % number of channels
+    % Set defaults
+    if nargin < 3
+        dbNoise = -20; % -20dB from signal
+    end
+    if nargin < 2
+        typeNoise = "white";
+    end
 
-% bounded output
-if (typeNoise == "brown")
-    bOut = false;
-else
-    bOut = true;
-end
-fNoise = dsp.ColoredNoise(typeNoise, samp, numChan, 'BoundedOutput', bOut);
-noiseOut = fNoise(); % get noise from generator
+    % Set param
+    samp = length(sInput); % number of samples / length
+    numChan = 1; % number of channels
+    bOut = (typeNoise ~= "brown");
 
-if (typeNoise == "brown")
-    noiseOut = 0.01 .* noiseOut;
-elseif (typeNoise == "white")
-    noiseOut = ampScale(noiseOut, 0.1);
-else
-    noiseOut = ampScale(noiseOut, 0.3);
-end
+    % Get Noise
+    fNoise = dsp.ColoredNoise(typeNoise, samp, numChan, 'BoundedOutput', bOut);
+    noiseOut = fNoise(); % get noise from generator
 
+    % Scale to specified dB
+    scale = db2mag(dbNoise) * max(abs(sInput));
+    noiseOut = ampScale(noiseOut, scale);
+    
+    % Warn if Signal-to-Noise Ratio is too low
+    R = snr(sInput, noiseOut);
+    if R < SNR_WARN_THRESHOLD
+        warning("addNoise() produced a signal that has an SNR = %.3fdB", R);
+    end
 
-
-% % Plot
-% t = (0:length(s)-1)/Fs;
-% figure; plot(t, s, t, noiseOut);
-
-%sound(noiseOut, Fs)
-
-% Add noise and play
-sOutput = sInput + noiseOut;
-% p = audioplayer(s, Fs);
-% play(p);
-
+    % Add noise to output
+    sOutput = sInput + noiseOut;
 end
 
 % Function to scale signal

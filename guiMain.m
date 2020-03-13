@@ -23,7 +23,7 @@ set(board.patFiel, 'callback', @patFie);
 set(board.loaButt, 'callback', @loaAud);
 
 %% Train/Verify Function
-function processSound(s, fs)
+function forwardSound(s, fs)
     global isTrain spkName inputDic
     
     if isTrain
@@ -33,8 +33,7 @@ function processSound(s, fs)
         setOutText(string(strcat("Trained: ", spkName)));
     else
         % Send to find speaker
-        outSpkr = test42(s, fs, inputDic);
-        isValid = 1; % TODO: get validity of speaker
+        [outSpkr, isValid] = test42(s, fs, inputDic);
         if isValid
             otxt = string(strcat("Speaker is: ", outSpkr));
             setOutText(otxt);
@@ -49,7 +48,7 @@ function loaAud(~, ~)
     global path
     [s, Fs] = getSoundFromPath(path);
     setOutText(['Loading sound from path: ', path]);
-    processSound(s, Fs);
+    forwardSound(s, Fs);
     pause(1);
 end
 
@@ -70,7 +69,7 @@ function stoAud(~, ~)
     
     % Get sound data from recorder and forward it
     s = getaudiodata(recObj);
-    processSound(s, Fs);
+    forwardSound(s, Fs);
 end
 
 function namFie(hObj, ~, ~)

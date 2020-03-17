@@ -1,9 +1,12 @@
 # EEC201 Speaker Recognition
 #### Team 42: Henrry Gunawan, Wai Cheong Tsoi
+![deep](/img/deep.jpg)
 
 ## Introduction
 This project builds a system that recognizes the speaker by using mel-frequency cepstrum 
 coefficients, vector quantization and k-clustering.
+
+![train](/img/train42.png)
 
 ## Completed Milestones
 1. Mel-Frequency Cepstrum Coefficients

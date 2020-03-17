@@ -16,7 +16,7 @@ trainFails = zeros(1, 11); testFails = zeros(1, 8);
 % Main
 for j = 1:numTrials
     % Train with all train data
-    if nargin == 0 || nargin == 1
+    if nargin < 2
         inputDic = getInputDic();
     else
         inputDic = getInputDic(noise, N, p, pTrain, M, K, thres_distortion); 

@@ -1,4 +1,4 @@
-function [sOutput, noiseOut] = addNoise(sInput, typeNoise, dbNoise)
+function [sOutput, noiseOut] = addNoise(sInput, typeNoise, idealSNR)
     %addNoise() adds coloured noise into the input sound file
     % Inputs:
     % sInput - Sound array
@@ -13,7 +13,7 @@ function [sOutput, noiseOut] = addNoise(sInput, typeNoise, dbNoise)
 
     % Set defaults
     if nargin < 3
-        dbNoise = -20; % -20dB from signal
+        idealSNR = 25; % 25dB from signal
     end
     if nargin < 2
         typeNoise = "white";
@@ -29,17 +29,17 @@ function [sOutput, noiseOut] = addNoise(sInput, typeNoise, dbNoise)
     noiseOut = fNoise(); % get noise from generator
 
     % Scale to specified dB
-    scale = db2mag(dbNoise) * max(abs(sInput));
+    scale = db2mag(-1*idealSNR-10) * max(abs(sInput));
     noiseOut = ampScale(noiseOut, scale);
-    
-    % Warn if Signal-to-Noise Ratio is too low
-    R = snr(sInput, noiseOut);
-    if R < SNR_WARN_THRESHOLD
-        warning("addNoise() produced a signal that has an SNR = %.3fdB", R);
-    end
 
     % Add noise to output
     sOutput = sInput + noiseOut;
+    
+    % Warn if Signal-to-Noise Ratio is too low
+    R = snr(sOutput, noiseOut);
+    if R < SNR_WARN_THRESHOLD
+        warning("addNoise() produced a signal that has an SNR = %.3fdB", R);
+    end
 end
 
 % Function to scale signal

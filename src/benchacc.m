@@ -1,11 +1,12 @@
-%% Benchmark
+%% Benchmark Accuracy
 % Tests model against all train and test data
-function [accTrain, accTest] = benchmark(numTrials, noise, N, p, ...
-    pTrain, M, K, thres_distortion)
+% Running the function with no input will calculate accuracy of the
+% model for 25 iterations
+function benchacc(numTrials, noise, N, p, pTrain, M, K, thres_distortion)
 
 % Parameters
 if ~exist('numTrials', 'var') || isempty(numTrials)
-    numTrials =  10; % Number of times to iterate
+    numTrials =  25; % Number of times to iterate
 end
 rValid = 2;
 

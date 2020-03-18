@@ -1,5 +1,5 @@
 function [s, fs, t] = getFile(id, type)
-    % Reads from ./Data to fetch the file
+    % Reads from ./../Data to fetch the file
     % Input:
     % id = {0,1,2,..,10,11}
     % type = (string) {"train", "test"}
@@ -16,7 +16,7 @@ function [s, fs, t] = getFile(id, type)
     end
     
     if type == "train" || type == "test"
-        id_str = string( strcat('./Data/', type, '/s', int2str(id), '.wav') );
+        id_str = string( strcat('./../Data/', type, '/s', int2str(id), '.wav') );
     else
         error('Unrecognized type: Must be "train" or "test"');
     end

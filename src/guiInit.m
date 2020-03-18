@@ -1,11 +1,11 @@
 function board = guiInit()
 % Sets up a figure GUI for interaction
-% Returns the board object for control
+% Returns the board object for control to guiMain()
 
 % Set UI Window Size
 screen = get(0, 'ScreenSize');
 x0 = screen(3)/2-400; y0 = screen(4)/2-200;
-board.fig = figure('Name', "Team 42: Speaker Recognition GUI - Speak Louder Please", ...
+board.fig = figure('Name', "Team 42: Speaker Recognition GUI", ...
     'NumberTitle', 'off', 'position', [x0, y0, 700, 250]);
 set(board.fig, 'Color', [1,1,1]);
 

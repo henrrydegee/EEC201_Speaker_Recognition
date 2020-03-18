@@ -184,3 +184,55 @@ function distortion = ThisTheHouse(X, idx, centroids)
     end
     distortion = distortion ./ size(X, 1);
 end
+
+%% Visualization Plotting Functions
+function drawLine(p1, p2, varargin)
+%DRAWLINE Draws a line from point p1 to point p2
+%   DRAWLINE(p1, p2) Draws a line from point p1 to point p2 and holds the
+%   current figure
+
+plot([p1(1) p2(1)], [p1(2) p2(2)], varargin{:});
+
+end
+
+function plotDataPoints(X, idx, K)
+%PLOTDATAPOINTS plots data points in X, coloring them so that those with the same
+%index assignments in idx have the same color
+%   PLOTDATAPOINTS(X, idx, K) plots data points in X, coloring them so that those 
+%   with the same index assignments in idx have the same color
+
+% Create palette
+palette = hsv(K + 1);
+colors = palette(idx, :);
+
+% Plot the data
+scatter(X(:,1), X(:,2), 15, colors);
+
+end
+
+function plotProgresskMeans(X, centroids, previous, idx, K, i)
+%PLOTPROGRESSKMEANS is a helper function that displays the progress of 
+%k-Means as it is running. It is intended for use only with 2D data.
+%   PLOTPROGRESSKMEANS(X, centroids, previous, idx, K, i) plots the data
+%   points with colors assigned to each centroid. With the previous
+%   centroids, it also plots a line between the previous locations and
+%   current locations of the centroids.
+%
+
+% Plot the examples
+plotDataPoints(X, idx, K);
+
+% Plot the centroids as black x's
+plot(centroids(:,1), centroids(:,2), 'x', ...
+     'MarkerEdgeColor','k', ...
+     'MarkerSize', 10, 'LineWidth', 3);
+
+% Plot the history of the centroids with lines
+for j=1:size(centroids,1)
+    drawLine(centroids(j, :), previous(j, :));
+end
+
+% Title
+title(sprintf('Iteration number %d', i))
+
+end

@@ -1,18 +1,18 @@
 %% GUI Main
 % Run this to run the GUI
 % Author: Team 42 - Henrry Gunawan, Wai Cheong Tsoi
-clear; close all; clc;
+clear; close all;
 
 %% Global Variables
 global recObj isTrain spkName board Fs path inputDic
 [recObj, Fs] = getaudrec();
 isTrain = 1;
 spkName = "Name";
-path = './Data/';
+path = './../Data/';
 inputDic = getInputDic();
 
 %% Initialize
-board = guiInit();
+board = guiInit(); % Initialize the GUI
 
 % Set Function Associations
 set(board.recButt, 'callback', @recAud);
@@ -38,7 +38,7 @@ function forwardSound(s, fs)
             otxt = string(strcat("Speaker is: ", outSpkr));
             setOutText(otxt);
         else
-            setOutText(["Match not found."]);
+            setOutText("Match not found.");
             % For False Positive Testing Purposes:
             %fprintf(string(strcat("Speaker is: ", outSpkr)));
         end

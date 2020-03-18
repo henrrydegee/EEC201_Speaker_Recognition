@@ -164,6 +164,10 @@ Note: For this project, the Mel-Frequency Filter Bank used was the following:
 <p align="center"> <img src="/img/melfb.png" width="511" height="420" alt="Mel Filter Banks"> </p>
 
 #### Cepstrum
+The concept of Cepstrum and its variations would be too complicated to be explained here. Please kindly 
+refer to other references, like [Wikipedia](https://en.wikipedia.org/wiki/Cepstrum), for more information 
+regarding this topic. For your reference, the equation for cepstrum is listed below.
+
 ![Cepstrum](/img/cepstrum.PNG)
 
 #### MFCCs
@@ -174,5 +178,9 @@ The Mel-Frequency Cepstrum Coefficients are widely used in speech processing and
 4. Perform a Discrete Cosine Transform onto result 3.
 5. The amplitudes after performing the procedure above are the MFCCs.
 
+## Footnote
++ This project is done under the pledge of the UC Davis Code of Academic Conduct.
++ We would like to acknowledge YouTube and Coursera content creaters that helped provide insights to the project.
++ Special Thanks to Professor Z. Ding and Q. Deng for their support and guidance on this project.
 
-###### Last Updated: March 17, 2020
+###### Last Updated: March 18, 2020

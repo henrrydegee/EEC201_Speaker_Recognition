@@ -1,5 +1,6 @@
 # Drive Files
 ./.tmp.drivedownload/
+.tmp.drivedownload/
 .vscode/
 .MATLABDriveTag
 desktop.ini
@@ -12,3 +13,7 @@ desktop.ini
 
 #
 ./Data/desktop.ini
+
+# Other Files
+Presentation Slides.gslides
+backup/
